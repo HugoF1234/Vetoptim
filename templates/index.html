@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Vetoptim SQL Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        overflow: hidden;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+        position: relative;
+      }
+      
+      .logo {
+        width: 120px;
+        height: auto;
+        margin-bottom: 20px;
+      }
+      
+      .header h1 {
+        font-size: 2.2em;
+        margin-bottom: 10px;
+        font-weight: 700;
+        color: #1e3a8a;
+      }
+      
+      .header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+        color: #64748b;
+      }
+      
+      .nav-links {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+      }
+      
+      .nav-link {
+        background: rgba(255, 255, 255, 0.9);
+        color: #1e3a8a;
+        padding: 10px 20px;
+        border-radius: 20px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        font-weight: 600;
+      }
+      
+      .nav-link:hover {
+        background: #f59e0b;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+      }
+      
+      .content {
+        padding: 40px;
+      }
+      
+      .message.user {
+        text-align: right;
+        margin-bottom: 20px;
+      }
+      
+      .message.user span {
+        display: inline-block;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 20px 20px 5px 20px;
+        max-width: 80%;
+        box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+        font-weight: 500;
+      }
+      
+      .message.bot {
+        text-align: left;
+        margin-bottom: 20px;
+      }
+      
+      .message.bot span {
+        display: inline-block;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 20px 20px 20px 5px;
+        max-width: 80%;
+        box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+        font-weight: 500;
+      }
+      
+      .form-container {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 30px;
+        border-radius: 15px;
+        margin-top: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #1e3a8a;
+      }
+      
+      input[type="text"] {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 25px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: white;
+      }
+      
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      
+      .btn {
+        background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+      }
+      
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+      }
+      
+      .btn:active {
+        transform: translateY(0);
+      }
+      
+      .sql, .error {
+        font-family: 'Fira Code', 'Courier New', monospace;
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #3b82f6;
+        overflow-x: auto;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      }
+      
+      .sql-title {
+        font-weight: 600;
+        margin-top: 20px;
+        color: #1e3a8a;
+        font-size: 1.1em;
+      }
+      
+      .data-table {
+        overflow-x: auto;
+        max-height: 500px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-top: 20px;
+      }
+      
+      .data-table table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+      }
+      
+      .data-table thead {
+        position: sticky;
+        top: 0;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        z-index: 10;
+      }
+      
+      .data-table th {
+        color: white;
+        padding: 15px 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .data-table tbody tr {
+        transition: background-color 0.2s ease;
+      }
+      
+      .data-table tbody tr:nth-child(even) {
+        background: #f8fafc;
+      }
+      
+      .data-table tbody tr:hover {
+        background: #dbeafe;
+      }
+      
+      .data-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e2e8f0;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .data-table td:hover {
+        white-space: normal;
+        word-break: break-word;
+      }
+      
+      .stats {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+      }
+      
+      .error {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        color: white;
+        border-left-color: #dc2626;
+      }
+      
+      .vetoptim-branding {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 15px;
+        border: 1px solid #e2e8f0;
+      }
+      
+      .vetoptim-branding h2 {
+        color: #1e3a8a;
+        font-size: 1.8em;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+      
+      .vetoptim-branding p {
+        color: #64748b;
+        font-size: 1.1em;
+      }
+      
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+          border-radius: 15px;
+        }
+        
+        .content {
+          padding: 20px;
+        }
+        
+        .header h1 {
+          font-size: 1.8em;
+        }
+        
+        .nav-links {
+          flex-direction: column;
+          gap: 10px;
+        }
+        
+        .message.user span,
+        .message.bot span {
+          max-width: 95%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="/static/image.png" alt="Vetoptim Logo" class="logo">
+        <h1>Assistant SQL Vetoptim</h1>
+        <p>Transformez vos questions en requêtes SQL intelligentes pour votre base de données</p>
+        <div class="nav-links">
+          <a href="/schema" class="nav-link">📋 Schéma BDD</a>
+          <a href="/diagram" class="nav-link">🗺️ Diagramme Relations</a>
+        </div>
+      </div>
+      
+      <div class="content">
+        <div class="vetoptim-branding">
+          <h2>🔍 Analyse de Données Intelligente</h2>
+          <p>Interrogez votre base de données Vetoptim en langage naturel et obtenez des insights précieux pour votre activité vétérinaire</p>
+        </div>
+
+        {% if request.method == 'POST' %}
+          <div class="message user">
+            <span>{{ request.form["question"] }}</span>
+          </div>
+
+          {% if error %}
+            <div class="message bot">
+              <span>⚠️ Une erreur est survenue : {{ error }}</span>
+            </div>
+          {% else %}
+            <div class="stats">
+              ✅ Résultats trouvés : {{ row_count }} ligne(s)
+            </div>
+
+            {% if result and columns %}
+              <div class="sql-title">📊 Données :</div>
+              <div class="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      {% for column in columns %}
+                        <th>{{ column }}</th>
+                      {% endfor %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in result %}
+                      <tr>
+                        {% for cell in row %}
+                          <td title="{{ cell if cell is not none else '' }}">{{ cell if cell is not none else '' }}</td>
+                        {% endfor %}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% elif result is none %}
+              <div class="message bot">
+                <span>ℹ️ Aucune donnée trouvée pour cette requête.</span>
+              </div>
+            {% endif %}
+
+            {% if sql_query %}
+              <div class="sql-title">🔍 Requête SQL utilisée :</div>
+              <div class="sql">{{ sql_query }}</div>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+
+        <div class="form-container">
+          <form method="post">
+            <div class="form-group">
+              <label for="question">Posez votre question sur vos données :</label>
+              <input type="text" id="question" name="question" placeholder="Ex: Montre-moi les 5 premiers contrats actifs" required>
+            </div>
+            <button type="submit" class="btn">🚀 Analyser les données</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+ 
